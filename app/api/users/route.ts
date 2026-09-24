@@ -120,8 +120,7 @@ export async function POST(request: NextRequest) {
 
 // PUT: Update user
 export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ userCode: string }> }
+  request: NextRequest
 ) {
   try {
     //const { userCode } = await params;
