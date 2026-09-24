@@ -5,7 +5,7 @@ import Navbar from "@/components/manager/navbar";
     const user = await getCurrentUser();
     return ( 
      <div className="min-h-screen bg-gray-100">
-     <Navbar username={user?.username ?? ""} />
+     {/* <Navbar username={user?.username ?? ""} /> */}
       <div className="flex"> 
         {/* <Sidebar  /> */}
          <main className="flex-1 overflow-y-auto p-6">
