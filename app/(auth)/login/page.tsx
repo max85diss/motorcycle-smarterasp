@@ -27,6 +27,7 @@ export default function LoginPage() {
         headers: {
           "Content-Type": "application/json",
         },
+         credentials: "include",
         body: JSON.stringify({
           username,
           password,
@@ -53,6 +54,7 @@ export default function LoginPage() {
            const position = user.position;
      
            console.log(location)
+           console.log(position)
            if (position ==="Manager")
            {
             // console.log("working")
@@ -70,10 +72,12 @@ export default function LoginPage() {
            }
           }
 
-      router.refresh();
+      //router.refresh();
     } catch {
+      console.error("Unable to connect to the server.");
       setError("Unable to connect to the server.");
     } finally {
+      console.log("finally")
       setLoading(false);
     }
   }
