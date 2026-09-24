@@ -56,7 +56,7 @@ export default function LoginPage() {
            if (position ==="Manager")
            {
              console.log("working")
-            router.replace(`/manager?username=${username}?location=${location}`)
+            router.replace(`/manager?username=${username}&location=${location}`)
      
            }else if (position === "Cashier")
            {
