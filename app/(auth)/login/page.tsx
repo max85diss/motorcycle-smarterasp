@@ -63,10 +63,13 @@ export default function LoginPage() {
      
            }else if (position === "Cashier")
            {
-            router.replace("/cashier")
+            //router.replace("/cashier")
+            router.replace("/manager")
+
            }else if (position ==="Documentation")
            {
-             router.replace("/documentation")
+             //router.replace("/documentation")
+             router.replace("/manager")
            }else{
              router.replace("/")
            }
