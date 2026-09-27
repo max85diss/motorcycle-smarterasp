@@ -1,51 +1,89 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
+const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export async function middleware(request: NextRequest) {
-    console.log("Middleware:", request.nextUrl.pathname);
-    const token = request.cookies.get("token")?.value;
 
-    const pathname = request.nextUrl.pathname;
+    const { pathname } = request.nextUrl;
 
-    console.log(pathname)
+    console.log("Middleware:", pathname);
 
     // Public routes
-    if (
-        pathname.startsWith("/login") ||
-        pathname.startsWith("/api/auth/login") ||
-        pathname.startsWith("/_next") ||
-        pathname.startsWith("/favicon.ico")
-    ) {
+    const publicRoutes = [
+        "/login",
+        "/api/auth/login",
+    ];
+
+    const isPublicRoute = publicRoutes.some((route) =>
+        pathname === route || pathname.startsWith(route + "/")
+    );
+
+    if (isPublicRoute) {
         return NextResponse.next();
     }
 
+    const token = request.cookies.get("token")?.value;
+
+    // No token
     if (!token) {
 
-        return NextResponse.redirect(new URL("/login", request.url));
+        // API request
+        if (pathname.startsWith("/api/")) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "Unauthorized"
+                },
+                { status: 401 }
+            );
+        }
 
+        // Normal page
+        return NextResponse.redirect(
+            new URL("/login", request.url)
+        );
     }
 
     try {
 
-        await jwtVerify(token, secret);
-        console.log("token verify:",token)
+        const { payload } = await jwtVerify(
+            token,
+            secret
+        );
+
+        console.log("Authenticated user:", payload);
+
         return NextResponse.next();
 
-    } catch {
+    } catch (error) {
 
-        return NextResponse.redirect(new URL("/login", request.url));
+        console.log("Invalid token");
 
+        // API request
+        if (pathname.startsWith("/api/")) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "Invalid or expired token"
+                },
+                { status: 401 }
+            );
+        }
+
+        // Normal page
+        return NextResponse.redirect(
+            new URL("/login", request.url)
+        );
     }
-
 }
 
 export const config = {
     matcher: [
-        "/dashboard/:path*",
-        "/users/:path*",
-        "/api/users/:path*",
-        "/manager-1/:path*"
-    ]
+        /*
+         * Run middleware on all application routes except
+         * Next.js internal files and static files.
+         */
+        "/((?!_next/static|_next/image|favicon.ico).*)",
+    ],
 };
