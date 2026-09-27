@@ -59,10 +59,11 @@ export async function POST(req: NextRequest) {
     // -----------------------------------------
     // Cookie options
     // -----------------------------------------
+    const isProduction = process.env.NODE_ENV === "production";
 
     const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure:isProduction,
       sameSite: "lax" as const,
       path: "/",
       maxAge: 60 * 60 * 8,
