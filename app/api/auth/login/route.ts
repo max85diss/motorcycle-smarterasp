@@ -60,10 +60,10 @@ export async function POST(req: NextRequest) {
     // Cookie options
     // -----------------------------------------
     const isProduction = process.env.NODE_ENV === "production";
-
+    console.log("isProduction", isProduction)
     const cookieOptions = {
       httpOnly: true,
-      secure:isProduction,
+      secure:false,
       sameSite: "lax" as const,
       path: "/",
       maxAge: 60 * 60 * 8,
