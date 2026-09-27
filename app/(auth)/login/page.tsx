@@ -60,7 +60,7 @@ export default function LoginPage() {
              console.log("working")
            //router.replace(`/manager?username=${username}&location=${location}`)
           // router.replace("/manager")
-           router.replace("/manager-1")
+           router.replace("/manager")
      
            }else if (position === "Cashier")
            {
