@@ -46,6 +46,6 @@ export const config = {
         "/dashboard/:path*",
         "/users/:path*",
         "/api/users/:path*",
-        "/manager/:path*"
+        "/manager-1/:path*"
     ]
 };
