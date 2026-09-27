@@ -17,7 +17,7 @@ interface MenuItem {
 const menus: MenuItem[] = [
   {
     title: "Dashboard",
-    href: "/manager",
+    href: "/manager-1",
   },
 
   {
@@ -25,15 +25,15 @@ const menus: MenuItem[] = [
     children: [
       {
         title: "Users",
-        href: "/manager/user/newUser",
+        href: "/manager-1/user/newUser",
       },
       {
         title: "Roles",
-        href: "/manager/user/roles",
+        href: "/manager-1/user/roles",
       },
       {
         title: "Permissions",
-        href: "/dashboard/permissions",
+        href: "/manager-1/dashboard/permissions",
       },
     ],
   },
@@ -42,15 +42,15 @@ const menus: MenuItem[] = [
     children: [
       {
         title: "New",
-        href: "/manager/branch/add-branch",
+        href: "/manager-1/branch/add-branch",
       },
       {
         title: "Target",
-        href: "/dashboard/roles",
+        href: "/manager-1/dashboard/roles",
       },
       {
         title: "Performance",
-        href: "/dashboard/permissions",
+        href: "/manager-1/dashboard/permissions",
       },
     ],
   },
@@ -59,15 +59,15 @@ const menus: MenuItem[] = [
     children: [
       {
         title: "Cashbook",
-        href: "/manager/cashbook/viewCashbook",
+        href: "/manager-1/cashbook/viewCashbook",
       },
       {
         title: "Bankbook",
-        href: "/manager/bankbook/view",
+        href: "/manager-1/bankbook/view",
       },
       {
         title: "Cheques",
-        href: "/manager/bankbook/cheques",
+        href: "/manager-1/bankbook/cheques",
       },
     ],
   },
@@ -78,15 +78,15 @@ const menus: MenuItem[] = [
     children: [
       {
         title: "Consignments",
-        href: "/manager/consignment/create",
+        href: "/manager-1/consignment/create",
       },
       {
         title: "Stock",
-        href: "/manager/stock",
+        href: "/manager-1/stock",
       },
       {
         title: "Consignment Other Items",
-        href: "/manager/consignment-other-stock/stock-insert",
+        href: "/manager-1/consignment-other-stock/stock-insert",
       },
     ],
   },
@@ -96,15 +96,15 @@ const menus: MenuItem[] = [
     children: [
       {
         title: "Orders",
-        href: "/dashboard/orders",
+        href: "/manager-1/dashboard/orders",
       },
       {
         title: "Customers",
-        href: "/dashboard/customers",
+        href: "/manager-1/dashboard/customers",
       },
       {
         title: "Invoices",
-        href: "/dashboard/invoices",
+        href: "/manager-1/dashboard/invoices",
       },
     ],
   },
@@ -114,11 +114,11 @@ const menus: MenuItem[] = [
     children: [
       {
         title: "Sales Report",
-        href: "/dashboard/reports/sales",
+        href: "/manager-1/dashboard/reports/sales",
       },
       {
         title: "Inventory Report",
-        href: "/dashboard/reports/inventory",
+        href: "/manager-1/dashboard/reports/inventory",
       },
     ],
   },
@@ -128,19 +128,19 @@ const menus: MenuItem[] = [
      children: [
       {
         title: "Bike Settings",
-        href: "/manager/setting/bike",
+        href: "/manager-1/setting/bike",
       },
       {
         title: "Charge Settings",
-        href: "/manager/setting/charge",
+        href: "/manager-1/setting/charge",
       },
        {
         title: "Other Items Settings",
-        href: "/manager/setting/other-items",
+        href: "/manager-1/setting/other-items",
       },
        {
         title: "Bank Settings",
-        href: "/manager/bank-accounts",
+        href: "/manager-1/bank-accounts",
       },
     ],
   },
@@ -150,7 +150,7 @@ const menus: MenuItem[] = [
      children: [
       {
         title: "Consignment",
-        href: "/manager/consignment/approval",
+        href: "/manager-1/consignment/approval",
       },
      
     ],
