@@ -155,6 +155,17 @@ const menus: MenuItem[] = [
      
     ],
   },
+
+  {
+    title: "test",
+     children: [
+      {
+        title: "Consignment",
+        href: "/manager/test-upload",
+      },
+     
+    ],
+  },
 ];
 
 
