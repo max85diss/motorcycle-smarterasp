@@ -1,19 +1,16 @@
-
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { put, del } from "@vercel/blob";
 
 export async function POST(request: NextRequest) {
   try {
-     //const body = await request.json();
-    
-   
     const formData = await request.formData();
-    console.log("Received form data:", formData);
-    const oldPhotoPath = formData.get("oldPhotoPath") as string | null;
-    console.log("Deleting old photo:", oldPhotoPath);
-     deletePhoto(oldPhotoPath);
-    const file = formData.get("file") as File;
+
+    const oldPhotoPath =
+      formData.get("oldPhotoPath") as string | null;
+
+    const file = formData.get("file") as File | null;
+
+    console.log("Old photo:", oldPhotoPath);
 
     if (!file) {
       return NextResponse.json(
@@ -21,86 +18,99 @@ export async function POST(request: NextRequest) {
           success: false,
           message: "No file selected.",
         },
-        {
-          status: 400,
-        }
+        { status: 400 }
       );
     }
 
-    const bytes = await file.arrayBuffer();
-
-    const buffer = Buffer.from(bytes);
-
-    const uploadDirectory = path.join(
-      process.cwd(),
-      "public",
-      "uploads",
-      "users"
-    );
-
-    if (!fs.existsSync(uploadDirectory)) {
-      fs.mkdirSync(uploadDirectory, {
-        recursive: true,
-      });
+    // Check image
+    if (!file.type.startsWith("image/")) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Only image files are allowed.",
+        },
+        { status: 400 }
+      );
     }
 
-    const extension = path.extname(file.name);
+    // Optional: 5 MB limit
+    if (file.size > 5 * 1024 * 1024) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Image size cannot exceed 5 MB.",
+        },
+        { status: 400 }
+      );
+    }
+
+    /*
+     * Delete old photo
+     */
+    if (oldPhotoPath) {
+      try {
+        await del(oldPhotoPath);
+
+        console.log(
+          "Old photo deleted:",
+          oldPhotoPath
+        );
+      } catch (error) {
+        console.error(
+          "Failed to delete old photo:",
+          error
+        );
+      }
+    }
+
+    /*
+     * Generate new file name
+     */
+    const extension =
+      file.name.split(".").pop()?.toLowerCase() || "jpg";
 
     const fileName =
-      Date.now() +
-      "-" +
-      Math.round(Math.random() * 1000000) +
-      extension;
+      `users/${Date.now()}-${Math.round(
+        Math.random() * 1000000
+      )}.${extension}`;
 
-    const filePath = path.join(
-      uploadDirectory,
-      fileName
+    /*
+     * Upload to Vercel Blob
+     */
+    const blob = await put(
+      fileName,
+      file,
+      {
+        access: "public",
+        addRandomSuffix: false,
+      }
     );
 
-    fs.writeFileSync(filePath, buffer);
+    console.log("Uploaded:", blob.url);
 
     return NextResponse.json({
       success: true,
-      fileName,
-      imageUrl: `/uploads/users/${fileName}`,
+
+      fileName: blob.pathname,
+
+      imageUrl: blob.url,
+
+      url: blob.url,
     });
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      "Photo upload error:",
+      error
+    );
 
     return NextResponse.json(
       {
         success: false,
         message: "Photo upload failed.",
       },
-      {
-        status: 500,
-      }
+      { status: 500 }
     );
-
   }
-}
-
-
-
- function deletePhoto(photoPath: string | null)
-
- {
-
-
-  if (!photoPath) return;
-
-  const filePath = path.join(
-    process.cwd(),
-    "public",
-    photoPath.replace(/^\//, "")
-  );
-
-  
-
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
-  }
-
 }

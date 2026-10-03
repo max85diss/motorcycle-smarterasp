@@ -15,6 +15,8 @@ export default async function Dashboard() {
     location:user1?.location,
     photo: user1?.photo || "/images/user.png",
   };
+ // alert(user.photo);
+  console.log("Dashboard user:", user);
 
   return (
     <div className="min-h-screen bg-gray-100">

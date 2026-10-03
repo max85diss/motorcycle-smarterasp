@@ -1,178 +1,132 @@
-
 "use client";
 
 import { useState } from "react";
 
 export default function TestUploadPage() {
-    const [file, setFile] = useState<File | null>(null);
-    const [preview, setPreview] = useState<string>("");
-    const [uploadedImage, setUploadedImage] = useState<string>("");
-    const [uploading, setUploading] = useState(false);
-    const [message, setMessage] = useState("");
 
-    const handleFileChange = (
-        e: React.ChangeEvent<HTMLInputElement>
-    ) => {
-        const selectedFile = e.target.files?.[0];
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [loading, setLoading] = useState(false);
 
-        if (!selectedFile) return;
+  function handleFileChange(
+    e: React.ChangeEvent<HTMLInputElement>
+  ) {
+    const selectedFile = e.target.files?.[0];
 
-        // Check image
-        if (!selectedFile.type.startsWith("image/")) {
-            setMessage("Please select an image file.");
-            return;
-        }
+    if (!selectedFile) return;
 
-        setFile(selectedFile);
-        setMessage("");
+    setFile(selectedFile);
 
-        // Create local preview
-        const previewUrl = URL.createObjectURL(selectedFile);
-        setPreview(previewUrl);
+    const previewUrl = URL.createObjectURL(selectedFile);
+    setPreview(previewUrl);
+  }
 
-        // Clear previous uploaded image
-        setUploadedImage("");
-    };
+  async function uploadImage() {
 
-    const handleUpload = async () => {
-        if (!file) {
-            setMessage("Please select an image first.");
-            return;
-        }
+    if (!file) {
+      alert("Please select an image");
+      return;
+    }
 
-        try {
-            setUploading(true);
-            setMessage("");
+    setLoading(true);
 
-            const formData = new FormData();
-            formData.append("file", file);
+    try {
 
-            const response = await fetch("/api/upload/test-upload", {
-                method: "POST",
-                body: formData,
-            });
+      const formData = new FormData();
 
-            const result = await response.json();
+      formData.append("file", file);
+      formData.append("folder", "users");
 
-            if (!response.ok) {
-                throw new Error(result.message || "Upload failed");
-            }
+      const response = await fetch("/api/upload/test-upload", {
+        method: "POST",
+        body: formData,
+      });
 
-            setMessage("Photo uploaded successfully.");
+      const result = await response.json();
 
-            // Returned URL from API
-            setUploadedImage(result.url);
+      if (!response.ok || !result.success) {
+        throw new Error(
+          result.message || "Upload failed"
+        );
+      }
 
-        } catch (error) {
-            console.error(error);
+      setImageUrl(result.url);
 
-            setMessage(
-                error instanceof Error
-                    ? error.message
-                    : "Upload failed"
-            );
-        } finally {
-            setUploading(false);
-        }
-    };
+      alert("Image uploaded successfully");
 
-    return (
-        <div className="min-h-screen bg-gray-100 p-6">
+    } catch (error) {
 
-            <div className="mx-auto max-w-2xl">
+      console.error(error);
 
-                <div className="rounded-lg bg-white p-6 shadow">
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Upload failed"
+      );
 
-                    <h1 className="mb-6 text-2xl font-bold">
-                        Photo Upload
-                    </h1>
+    } finally {
+      setLoading(false);
+    }
+  }
 
-                    {/* File selection */}
-                    <div className="mb-4">
+  return (
+    <div className="p-8">
 
-                        <label className="mb-2 block text-sm font-medium">
-                            Select Photo
-                        </label>
+      <h1 className="mb-6 text-2xl font-bold">
+        Upload User Photo
+      </h1>
 
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                            className="block w-full rounded border p-2"
-                        />
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        className="mb-4"
+      />
 
-                    </div>
+      {preview && (
+        <div className="mb-5">
+          <p className="mb-2 font-semibold">
+            Preview
+          </p>
 
-                    {/* Local Preview */}
-                    {preview && (
-                        <div className="mb-6">
+          <img
+            src={preview}
+            alt="Preview"
+            className="h-48 w-48 rounded-lg object-cover"
+          />
+        </div>
+      )}
 
-                            <h2 className="mb-2 text-lg font-semibold">
-                                Preview
-                            </h2>
+      <button
+        type="button"
+        onClick={uploadImage}
+        disabled={!file || loading}
+        className="rounded bg-blue-600 px-5 py-2 text-white disabled:bg-gray-400"
+      >
+        {loading ? "Uploading..." : "Upload Image"}
+      </button>
 
-                            <div className="flex justify-center rounded-lg border bg-gray-50 p-4">
+      {imageUrl && (
+        <div className="mt-8">
 
-                                <img
-                                    src={preview}
-                                    alt="Preview"
-                                    className="max-h-80 max-w-full rounded object-contain"
-                                />
+          <p className="mb-2 font-semibold">
+            Uploaded Image
+          </p>
 
-                            </div>
+          <img
+            src={imageUrl}
+            alt="Uploaded"
+            className="h-48 w-48 rounded-lg object-cover"
+          />
 
-                        </div>
-                    )}
-
-                    {/* Upload button */}
-                    <button
-                        type="button"
-                        onClick={handleUpload}
-                        disabled={!file || uploading}
-                        className="rounded bg-blue-600 px-5 py-2 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400"
-                    >
-                        {uploading
-                            ? "Uploading..."
-                            : "Upload Photo"}
-                    </button>
-
-                    {/* Message */}
-                    {message && (
-                        <p className="mt-4 text-sm">
-                            {message}
-                        </p>
-                    )}
-
-                </div>
-
-                {/* Uploaded image */}
-                {uploadedImage && (
-                    <div className="mt-6 rounded-lg bg-white p-6 shadow">
-
-                        <h2 className="mb-4 text-lg font-semibold">
-                            Uploaded Photo
-                        </h2>
-
-                        <div className="flex justify-center rounded-lg border bg-gray-50 p-4">
-
-                            <img
-                                src={uploadedImage}
-                                alt="Uploaded"
-                                className="max-h-96 max-w-full rounded object-contain"
-                            />
-
-                        </div>
-
-                        <p className="mt-4 break-all text-sm text-gray-600">
-                            URL: {uploadedImage}
-                        </p>
-
-                    </div>
-                )}
-
-            </div>
+          <p className="mt-3 break-all text-sm">
+            {imageUrl}
+          </p>
 
         </div>
-    );
-}
+      )}
 
+    </div>
+  );
+}

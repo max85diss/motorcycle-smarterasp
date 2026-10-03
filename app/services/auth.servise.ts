@@ -20,7 +20,7 @@ export class AuthService {
             console.log(isValid);
 
           if (!isValid) { return null; } 
-          
+          console.log("authservise:",user);
           return { empCode: user.EmpCode, username: user.Username, position: user.Position, location: user.Location,branchCode:user.BranchCode, photo:user.Photo }; 
         }
      }

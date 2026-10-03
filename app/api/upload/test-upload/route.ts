@@ -1,92 +1,71 @@
-
+import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
 
 export async function POST(request: Request) {
-    try {
-        const formData = await request.formData();
+  try {
+    const formData = await request.formData();
 
-        const file = formData.get("file") as File | null;
+    const file = formData.get("file") as File | null;
+    const folder = formData.get("folder")?.toString() || "uploads";
 
-        if (!file) {
-            return NextResponse.json(
-                {
-                    success: false,
-                    message: "No file selected",
-                },
-                { status: 400 }
-            );
-        }
-
-        if (!file.type.startsWith("image/")) {
-            return NextResponse.json(
-                {
-                    success: false,
-                    message: "Only image files are allowed",
-                },
-                { status: 400 }
-            );
-        }
-
-        // Generate unique filename
-        const extension =
-            path.extname(file.name) || ".jpg";
-
-        const fileName =
-            `${Date.now()}-${crypto.randomUUID()}${extension}`;
-
-        // IMPORTANT:
-        // Save inside public/uploads/users
-        const uploadDir = path.join(
-            process.cwd(),
-            "public",
-            "uploads",
-            "users"
-        );
-
-        await fs.mkdir(uploadDir, {
-            recursive: true,
-        });
-
-        const filePath = path.join(
-            uploadDir,
-            fileName
-        );
-
-        const bytes = await file.arrayBuffer();
-
-        await fs.writeFile(
-            filePath,
-            Buffer.from(bytes)
-        );
-
-        // Browser URL
-        const imageUrl =
-            `/uploads/users/${fileName}`;
-
-        console.log("Upload directory:", uploadDir);
-        console.log("Saved file:", filePath);
-        console.log("Image URL:", imageUrl);
-
-        return NextResponse.json({
-            success: true,
-            message: "Photo uploaded successfully",
-            url: imageUrl,
-            fileName: fileName,
-        });
-
-    } catch (error) {
-
-        console.error("Upload error:", error);
-
-        return NextResponse.json(
-            {
-                success: false,
-                message: "Photo upload failed",
-            },
-            { status: 500 }
-        );
+    if (!file) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "No file selected",
+        },
+        { status: 400 }
+      );
     }
-}
 
+    // Only allow images
+    if (!file.type.startsWith("image/")) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Only image files are allowed",
+        },
+        { status: 400 }
+      );
+    }
+
+    // 5 MB limit
+    if (file.size > 5 * 1024 * 1024) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Image size cannot exceed 5 MB",
+        },
+        { status: 400 }
+      );
+    }
+
+    const extension =
+      file.name.split(".").pop()?.toLowerCase() || "jpg";
+
+    const fileName =
+      `${folder}/${crypto.randomUUID()}.${extension}`;
+
+    const blob = await put(fileName, file, {
+      access: "public",
+      addRandomSuffix: false,
+    });
+
+    return NextResponse.json({
+      success: true,
+      url: blob.url,
+      pathname: blob.pathname,
+    });
+
+  } catch (error) {
+    console.error("Upload error:", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Image upload failed",
+      },
+      { status: 500 }
+    );
+  }
+}
